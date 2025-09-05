@@ -24,7 +24,6 @@ Tracking adoption and usage of hooks is critical for:
 
 ## Exposed API
 _Details coming soon._
-```
 
 ## Indexing Methodology
 
