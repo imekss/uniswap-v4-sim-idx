@@ -45,13 +45,13 @@ app.get("/poolInitialized", async (c) => {
   }
 });
 
-// Test API for poolCreated
-app.get("/poolCreated", async (c) => {
+// Test API for poolSwap
+app.get("/poolSwap", async (c) => {
   try {
     const result = await db
       .client(c)
       .select()
-      .from(poolInitialized)
+      .from(poolSwap)
       .limit(5);
 
     return Response.json({
