@@ -1,41 +1,45 @@
-# Sim IDX Sample Project
+# 🦄 Uniswap v4 Hooks Indexer (Dune SIM IDX)
 
-**Sim IDX** is a framework that helps you build and deploy applications that index blockchain data in minutes. Define listeners that react to specific onchain events, extract relevant data, and automatically make this data queryable via an API.
+This project uses [Dune SIM IDX](https://docs.sim.dune.com/idx) to **index Uniswap v4 PoolManager events** directly in Solidity, 
+and expose APIs for hook adoption and usage analytics.
 
-This sample project indexes **Uniswap V3 Factory pool creation events** and serves as your starting point for building with Sim IDX.
+## What it does
+- Indexes **pool initialization** (which tokens, fee tier, tick spacing, and hook address).
+- Indexes **pool swaps** (amounts, price movement, liquidity, tick).
+- Exposes API endpoints for:
+  - **Hook adoption** – which hooks are being used, and when they were first seen.
+  - **Pools by hook** – list pools initialized with a given hook.
+  - **Hook usage over time** – daily swap activity per hook.
+  - **Pool activity samples** – latest swaps or inits (for dashboards/testing).
 
-When you're ready to continue, the [Quickstart guide](https://docs.sim.dune.com/idx) will walk you through authenticating and testing your listener on real data.
+Built with [Dune SIM IDX](https://docs.sim.dune.com/idx), a framework that helps you index blockchain data in minutes by defining listeners that react to onchain events, extract relevant data, and automatically make it queryable via an API, with the option to extend your indexer using custom **Solidity** code to capture advanced onchain logic directly from smart contracts .
 
-## What You'll Edit
+## Why it matters
+Uniswap v4 introduces **hooks** (custom contracts that extend pool behavior).  
+Tracking adoption and usage of hooks is critical for:
+- Understanding ecosystem experiments (e.g. dynamic fees, custom AMMs).
+- Measuring adoption across chains (Ethereum, Base, Unichain, …).
+- Providing a foundation for more advanced analytics (TVL, fee revenue, LP activity).
 
-The main files and folders you'll work with are:
 
--   **`abis/`** - Add JSON ABI files for contracts you want to index.
--   **`listeners/src/`** - Define your `Triggers` contract in `Main.sol` and implement your handler logic in one or more listener contracts.
--   **`apis/src/index.ts`** - Define APIs for your indexed data.
-
-## App Structure
-
-```text
-.
-├── sim.toml                     # App configuration
-├── apis/                        # Your custom API code
-├── abis/                        # Contract ABI files (JSON)
-│   └── UniswapV3Factory.json    # Example: Uniswap V3 Factory ABI
-└── listeners/                   # Foundry project for listener contracts
-    ├── src/
-    │   └── Main.sol             # Triggers contract & listener logic
-    └── test/
-        └── Main.t.sol           # Unit tests for your listener
+## Exposed API
+_Details coming soon._
 ```
 
-The `listeners/` directory is a Foundry project where your indexing logic lives. For a detailed breakdown of each file and folder, see the [App Folder Structure](https://docs.sim.dune.com/idx/app-structure) documentation.
+## Indexing Methodology
 
-## Next Steps
+_Details coming soon._
+
+## Querying Methodology
+
+_Details coming soon._
+
+
+## SIM IDX: Quickstart Resources
 
 Ready to start building? Check out our comprehensive guides:
 
--   **[Deploying Your App](https://docs.sim.dune.com/idx/deployment)** - Deploy your app
--   **[Adding ABIs](https://docs.sim.dune.com/idx/cli#sim-abi)** - How to add contract ABIs
--   **[Writing Listeners](https://docs.sim.dune.com/idx/listener)** - Define your indexing logic
--   **[CLI Reference](https://docs.sim.dune.com/idx/cli)** - All available commands
+- **[Deploying Your App](https://docs.sim.dune.com/idx/deployment)** - Deploy your app
+- **[Adding ABIs](https://docs.sim.dune.com/idx/cli#sim-abi)** - How to add contract ABIs
+- **[Writing Listeners](https://docs.sim.dune.com/idx/listener)** - Define your indexing logic
+- **[CLI Reference](https://docs.sim.dune.com/idx/cli)** - All available commands
