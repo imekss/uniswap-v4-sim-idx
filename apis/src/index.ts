@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { poolInitialized } from "./db/schema/Listener"; // Adjust the import path as necessary
+import { poolInitialized, poolSwap } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { types, db, App, middlewares } from "@duneanalytics/sim-idx"; // Import schema to ensure it's registered
 
 // const filterToken0 = types.Address.from(
@@ -9,13 +9,31 @@ import { types, db, App, middlewares } from "@duneanalytics/sim-idx"; // Import 
 const app = App.create();
 app.use("*", middlewares.authentication);
 
-app.get("/*", async (c) => {
+// app.get("/*", async (c) => {
+//   try {
+//     const result = await db
+//       .client(c)
+//       .select()
+//       .from(poolInitialized)
+//       // .where(eq(poolCreated.token0, filterToken0))
+//       .limit(5);
+
+//     return Response.json({
+//       result: result,
+//     });
+//   } catch (e) {
+//     console.error("Database operation failed:", e);
+//     return Response.json({ error: (e as Error).message }, { status: 500 });
+//   }
+// });
+
+// Test API for poolInitialized
+app.get("/poolInitialized", async (c) => {
   try {
     const result = await db
       .client(c)
       .select()
       .from(poolInitialized)
-      // .where(eq(poolCreated.token0, filterToken0))
       .limit(5);
 
     return Response.json({
@@ -26,5 +44,25 @@ app.get("/*", async (c) => {
     return Response.json({ error: (e as Error).message }, { status: 500 });
   }
 });
+
+// Test API for poolCreated
+app.get("/poolCreated", async (c) => {
+  try {
+    const result = await db
+      .client(c)
+      .select()
+      .from(poolInitialized)
+      .limit(5);
+
+    return Response.json({
+      result: result,
+    });
+  } catch (e) {
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+});
+
+
 
 export default app;
