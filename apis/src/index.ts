@@ -11,6 +11,7 @@ const app = App.create();
 app.use("*", middlewares.authentication);
 
 
+// API endpoint for hook adoption statistics
 app.get("/api/hooks/adoption", async (c) => {
   try {
     const result = await db.client(c)
