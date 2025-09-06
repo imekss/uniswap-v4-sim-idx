@@ -20,7 +20,10 @@ app.get("/api/hooks/adoption", async (c) => {
       firstSeenBlock: sql<number>`min(${poolInitialized.blockNumber})`.as("firstSeenBlock"),
       firstSeenTs: sql<number>`min(${poolInitialized.blockTimestamp})`.as("firstSeenTs"),
     })
-    .from(poolInitialized);
+    .from(poolInitialized)
+    .where(ne(poolInitialized.hooks, zeroAddress))
+    .groupBy(poolInitialized.hooks)
+    .limit(100);
 
     return Response.json({ data: result });
   } catch (e) {
