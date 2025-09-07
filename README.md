@@ -81,11 +81,83 @@ This will output aggregated information about pools initialized with that hook:
 ```
 
 ## Indexing Methodology
+[Dune SIM IDX](https://docs.sim.dune.com/idx) let us define **Solidity listeners** that react to Uniswap v4 PoolManger calls and events.
+We use `Main.sol` to:
+- Triggers on every `Initialize`, `Swap` or `ModifyLiquidity` event on Uniswap v4, we are listening to Unichain and Ethereum chains.
+```solidity
+contract Triggers is BaseTriggers {
+    function triggers() external virtual override {
+        PoolManagerListener listener = new PoolManagerListener();
 
-_Details coming soon._
+        // Ethereum
+        addTrigger(chainContract(Chains.Ethereum, POOLMANAGER_ETHEREUM),listener.triggerOnInitializeEvent());
+        addTrigger(chainContract(Chains.Ethereum, POOLMANAGER_ETHEREUM),listener.triggerOnSwapEvent());
+        addTrigger(chainContract(Chains.Ethereum, POOLMANAGER_ETHEREUM),listener.triggerOnModifyLiquidityEvent());
+
+        // Unichain
+        addTrigger(chainContract(Chains.Unichain, POOLMANAGER_UNICHAIN),listener.triggerOnInitializeEvent());
+        addTrigger(chainContract(Chains.Unichain, POOLMANAGER_UNICHAIN),listener.triggerOnSwapEvent());
+        addTrigger(chainContract(Chains.Ethereum, POOLMANAGER_UNICHAIN),listener.triggerOnModifyLiquidityEvent());
+
+    }
+}
+```
+
+We define our listener in `PoolManagerListener.sol`, which captured the following events:
+- `Initialize`  → records pool creation with `{currency0, currency1, fee, tickSpacing, hooks}`.
+- `Swap` → records trade amounts, price, liquidity, and tick.
+- `ModifyLiquidityEvent`  → tracks liquidity added/removed by LPs.
+
+```solidity
+    event PoolInitialized(
+        uint64 chainId,
+        bytes32 txnHash,
+        uint256 blockNumber,
+        uint256 blockTimestamp, 
+        bytes32 id,
+        address currency0,
+        address currency1,
+        uint24 fee,
+        int24 tickSpacing,
+        address hooks,
+        uint160 sqrtPriceX96,
+        int24 tick
+  
+    );
+
+    event PoolSwap(
+        uint64 chainId,
+        bytes32 txnHash,
+        uint256 blockNumber,
+        uint256 blockTimestamp,
+        bytes32 id,
+        address sender,
+        int128 amount0,
+        int128 amount1,
+        uint160 sqrtPriceX96,
+        uint128 liquidity,
+        int24 tick,
+        uint24 fee
+    );
+
+    event LiquidityModified(
+        uint64 chainId,
+        bytes32 txnHash,
+        uint256 blockNumber,
+        uint256 blockTimestamp,
+        bytes32 id,
+        address sender,
+        int24 tickLower,
+        int24 tickUpper,
+        int256 liquidityDelta,
+        bytes32 salt
+    );
+```
 
 ## Querying Methodology
-1. `/hook-adoptions` endpoint query the table poolInitialized table in our Database, and aggregated the hooks by the number of pools.
+1. `/hook-adoptions`
+Queries the `poolInitialized` table to aggregate pools by chain and hook address.  
+It returns the number of pools created with the given hook, along with the first block and timestamp where it appeared.
 ```sql
 SELECT chainId,
        hooks,
@@ -96,7 +168,7 @@ FROM poolInitialized
 WHERE hooks = $hooks
 GROUP BY 1,2
 ```
-2. <details>
+<!-- 2. <details> -->
 
 
 
