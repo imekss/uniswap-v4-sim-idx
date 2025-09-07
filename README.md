@@ -3,16 +3,14 @@
 This project uses [Dune SIM IDX](https://docs.sim.dune.com/idx) to **index Uniswap v4 PoolManager events** directly in Solidity, 
 and expose APIs for hook adoption and usage analytics.
 
-## 📖 Concepts
+## Concepts
 
-Uniswap v4 introduces **Hooks**, external smart contracts that extend the behavior of liquidity pools.  
+Uniswap v4 introduces [Hooks](https://docs.uniswap.org/contracts/v4/concepts/hooks), external smart contracts that extend the behavior of liquidity pools.  
 - Every **pool can have exactly one hook**.  
 - A **hook contract** can serve many pools, intercepting actions like `swap`, `mint`, or `burn`.  
 - Hooks are chosen at **pool initialization** and are part of the pool’s unique key (`currency0, currency1, fee, tickSpacing, hooks`).  
 - If `hooks = 0x000…000`, the pool is **hookless**.
 
-Reference:  
-<!-- ![Uniswap v4 Hooks](./docs/hooks.png)   -->
 
 Comparison across versions:  
 <table>
@@ -39,7 +37,7 @@ Comparison across versions:
     </tr>
     <tr>
       <td><b style="color:#ff007a;">v3</b></td>
-      <td><a href="#">UniswapV3Factory</a></td>
+      <td><a href="">UniswapV3Factory</a></td>
       <td><code>PoolCreated</code></td>
       <td><code>pool</code></td>
       <td><code>token0</code>, <code>token1</code></td>
@@ -59,7 +57,7 @@ Comparison across versions:
 </table>
 
 
-## What it does
+## What the API does
 - Indexes **pool initialization** (which tokens, fee tier, tick spacing, and hook address).
 - Indexes **pool swaps** (amounts, price movement, liquidity, tick).
 - Exposes API endpoints for:
@@ -71,9 +69,8 @@ Built with [Dune SIM IDX](https://docs.sim.dune.com/idx), a framework that helps
 
 
 ## Exposed API
-We expose the following API: `/hooks-adoptions?hook=0x000052423c1db6b7ff8641b85a7eefc7b2791888`
-This will then output a list of the in-range LPs:
-
+`GET /hooks-adoptions?hook=0x000052423c1db6b7ff8641b85a7eefc7b2791888`
+This will output aggregated information about pools initialized with that hook:
 ```json
 {
   "hook": "0x000052423c1db6b7ff8641b85a7eefc7b2791888",
@@ -88,8 +85,17 @@ This will then output a list of the in-range LPs:
 _Details coming soon._
 
 ## Querying Methodology
-The `/hook-adoptions` endpoint query the table poolInitialized table in our Database, and aggregated the hooks by the number of pools.
+1. `/hook-adoptions` endpoint query the table poolInitialized table in our Database, and aggregated the hooks by the number of pools.
+```
+SELECT hooks,
+       count(distinct id) as poolsCount, 
+       min(blockNumber) as firstSeenBlock, 
+       min(blockTimestamp) as firstSeents
+FROM poolInitialized
+WHERE hooks = $hooks
+GROUP BY hooks
 
+2. <details>
 
 
 
