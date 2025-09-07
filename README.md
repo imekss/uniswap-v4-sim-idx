@@ -86,14 +86,15 @@ _Details coming soon._
 
 ## Querying Methodology
 1. `/hook-adoptions` endpoint query the table poolInitialized table in our Database, and aggregated the hooks by the number of pools.
-```
-SELECT hooks,
+```sql
+SELECT chainId,
+       hooks,
        count(distinct id) as poolsCount, 
        min(blockNumber) as firstSeenBlock, 
        min(blockTimestamp) as firstSeents
 FROM poolInitialized
 WHERE hooks = $hooks
-GROUP BY hooks
+GROUP BY 1,2
 ```
 2. <details>
 
