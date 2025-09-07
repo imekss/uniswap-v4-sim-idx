@@ -59,13 +59,25 @@ Uniswap v4 introduces [Hooks](https://docs.uniswap.org/contracts/v4/concepts/hoo
 
 ## Exposed API
 `GET /hooks-adoptions?hook=0x000052423c1db6b7ff8641b85a7eefc7b2791888`
-In the request we are filtering a Bunni hook, this will output aggregated information about pools initialized with that chain/hook:
+This request filters for a specific Bunni hook and returns aggregated statistics about all pools initialized with that hook on each chain (Ethereum and Unichain)
 ```json
 {
-  "hook": "0x000052423c1db6b7ff8641b85a7eefc7b2791888",
-  "poolsCount": "90",
-  "firstSeenBlock": "19141943",
-  "firstSeenTs": "1749759695"
+  "data": [
+    {
+      "chain": "1",
+      "hook": "0x000052423c1db6b7ff8641b85a7eefc7b2791888",
+      "poolsCount": "40",
+      "firstSeenBlock": "22690833",
+      "firstSeenTs": "1749759695"
+    },
+    {
+      "chain": "130",
+      "hook": "0x000052423c1db6b7ff8641b85a7eefc7b2791888",
+      "poolsCount": "50",
+      "firstSeenBlock": "19141943",
+      "firstSeenTs": "1749890302"
+    }
+  ]
 }
 ```
 
