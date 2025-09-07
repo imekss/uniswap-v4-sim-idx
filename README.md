@@ -1,8 +1,63 @@
 # 🦄 Uniswap v4 Indexer (Dune SIM IDX)
 
-
 This project uses [Dune SIM IDX](https://docs.sim.dune.com/idx) to **index Uniswap v4 PoolManager events** directly in Solidity, 
 and expose APIs for hook adoption and usage analytics.
+
+## 📖 Concepts
+
+Uniswap v4 introduces **Hooks**, external smart contracts that extend the behavior of liquidity pools.  
+- Every **pool can have exactly one hook**.  
+- A **hook contract** can serve many pools, intercepting actions like `swap`, `mint`, or `burn`.  
+- Hooks are chosen at **pool initialization** and are part of the pool’s unique key (`currency0, currency1, fee, tickSpacing, hooks`).  
+- If `hooks = 0x000…000`, the pool is **hookless**.
+
+Reference:  
+<!-- ![Uniswap v4 Hooks](./docs/hooks.png)   -->
+
+Comparison across versions:  
+<table>
+  <thead>
+    <tr>
+      <th>Version</th>
+      <th>Contract</th>
+      <th>Event</th>
+      <th>Pool Identifier</th>
+      <th><code>token0</code> / <code>token1</code> Fields</th>
+      <th>Fee</th>
+      <th>Hooks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b style="color:#ff007a;">v2</b></td>
+      <td><a href="#">Factory</a></td>
+      <td><code>PairCreated</code></td>
+      <td><code>pair</code></td>
+      <td><code>token0</code>, <code>token1</code></td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td><b style="color:#ff007a;">v3</b></td>
+      <td><a href="#">UniswapV3Factory</a></td>
+      <td><code>PoolCreated</code></td>
+      <td><code>pool</code></td>
+      <td><code>token0</code>, <code>token1</code></td>
+      <td><code>fee</code></td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td><b style="color:#ff007a;">v4</b></td>
+      <td><a href="#">PoolManager</a></td>
+      <td><code>Initialize</code></td>
+      <td><code>id</code></td>
+      <td><code>currency0</code>, <code>currency1</code></td>
+      <td><code>fee</code></td>
+      <td><code>hooks</code></td>
+    </tr>
+  </tbody>
+</table>
+
 
 ## What it does
 - Indexes **pool initialization** (which tokens, fee tier, tick spacing, and hook address).
@@ -11,28 +66,29 @@ and expose APIs for hook adoption and usage analytics.
   - **Hook adoption** – which hooks are being used, and when they were first seen.
   - **Pools by hook** – list pools initialized with a given hook.
   - **Hook usage over time** – daily swap activity per hook.
-  - **Pool activity samples** – latest swaps or inits (for dashboards/testing).
 
 Built with [Dune SIM IDX](https://docs.sim.dune.com/idx), a framework that helps you index blockchain data in minutes by defining listeners that react to onchain events, extract relevant data, and automatically make it queryable via an API, with the option to extend your indexer using custom **Solidity** code to capture advanced onchain logic directly from smart contracts .
 
-## Why it matters
-Uniswap v4 introduces **hooks** (custom contracts that extend pool behavior).  
-Tracking adoption and usage of hooks is critical for:
-- Understanding ecosystem experiments (e.g. dynamic fees, custom AMMs).
-- Measuring adoption across chains (Ethereum, Base, Unichain, …).
-- Providing a foundation for more advanced analytics (TVL, fee revenue, LP activity).
-
 
 ## Exposed API
-_Details coming soon._
+We expose the following API: `/hooks-adoptions?hook=0x000052423c1db6b7ff8641b85a7eefc7b2791888`
+This will then output a list of the in-range LPs:
+
+```json
+{
+  "hook": "0x000052423c1db6b7ff8641b85a7eefc7b2791888",
+  "poolsCount": "90",
+  "firstSeenBlock": "19141943",
+  "firstSeenTs": "1749759695"
+}
+```
 
 ## Indexing Methodology
 
 _Details coming soon._
 
 ## Querying Methodology
-
-_Details coming soon._
+The `/hook-adoptions` endpoint query the table poolInitialized table in our Database, and aggregated the hooks by the number of pools.
 
 
 
