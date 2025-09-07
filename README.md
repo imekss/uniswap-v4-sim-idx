@@ -3,15 +3,15 @@
 This project uses [Dune SIM IDX](https://docs.sim.dune.com/idx) to **index Uniswap v4 PoolManager events** directly in Solidity, 
 and expose APIs for hook adoption and usage analytics.
 
-## Concepts
-
 Uniswap v4 introduces [Hooks](https://docs.uniswap.org/contracts/v4/concepts/hooks), external smart contracts that extend the behavior of liquidity pools.  
-- Every **pool can have exactly one hook**.  
-- A **hook contract** can serve many pools, intercepting actions like `swap`, `mint`, or `burn`.  
-- Hooks are chosen at **pool initialization** and are part of the pool’s unique key (`currency0, currency1, fee, tickSpacing, hooks`).  
+- Every **pool can have exactly one hook** chosen at initialization and stored in the pool’s unique key (`currency0, currency1, fee, tickSpacing, hooks`).  
 - If `hooks = 0x000…000`, the pool is **hookless**.
+- A **hook contract** can serve many pools, intercepting lifecycle actions like `beforeInitialize`, `beforeSwap`, or `afterDonate`. 
+<p align="center">
+  <img src="./docs/hooks-callbacks.png" alt="Uniswap v4 Hooks Lifecycle" width="800"/>
+</p>
 
-
+Here 
 Comparison across versions:  
 <table>
   <thead>
@@ -57,17 +57,6 @@ Comparison across versions:
 </table>
 
 
-## What the API does
-- Indexes **pool initialization** (which tokens, fee tier, tick spacing, and hook address).
-- Indexes **pool swaps** (amounts, price movement, liquidity, tick).
-- Exposes API endpoints for:
-  - **Hook adoption** – which hooks are being used, and when they were first seen.
-  - **Pools by hook** – list pools initialized with a given hook.
-  - **Hook usage over time** – daily swap activity per hook.
-
-Built with [Dune SIM IDX](https://docs.sim.dune.com/idx), a framework that helps you index blockchain data in minutes by defining listeners that react to onchain events, extract relevant data, and automatically make it queryable via an API, with the option to extend your indexer using custom **Solidity** code to capture advanced onchain logic directly from smart contracts .
-
-
 ## Exposed API
 `GET /hooks-adoptions?hook=0x000052423c1db6b7ff8641b85a7eefc7b2791888`
 This will output aggregated information about pools initialized with that hook:
@@ -107,6 +96,8 @@ We define our listener in `PoolManagerListener.sol`, which captured the followin
 - `Initialize`  → records pool creation with `{currency0, currency1, fee, tickSpacing, hooks}`.
 - `Swap` → records trade amounts, price, liquidity, and tick.
 - `ModifyLiquidityEvent`  → tracks liquidity added/removed by LPs.
+
+This captured events are saved in our db in the following tables: `poolInitialized`, `poolSwap`, `LiquidityModified`
 
 ```solidity
     event PoolInitialized(
