@@ -94,7 +94,7 @@ SELECT hooks,
 FROM poolInitialized
 WHERE hooks = $hooks
 GROUP BY hooks
-
+```
 2. <details>
 
 
