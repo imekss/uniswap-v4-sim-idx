@@ -58,7 +58,7 @@ Uniswap v4 introduces [Hooks](https://docs.uniswap.org/contracts/v4/concepts/hoo
 
 
 ## Exposed API
-`GET /hooks-adoptions?hook=0x000052423c1db6b7ff8641b85a7eefc7b2791888`
+`GET /hooks/0x000052423c1db6b7ff8641b85a7eefc7b2791888/adoption`
 This request filters for a specific Bunni hook and returns aggregated statistics about all pools initialized with that hook on each chain (Ethereum and Unichain)
 ```json
 {
@@ -158,7 +158,7 @@ This captured events are saved in our db in the following tables: `poolInitializ
 ```
 
 ## Querying Methodology
-1. `/hook-adoptions`
+1. `/hooks/:hook/adoption`
 Queries the `poolInitialized` table to aggregate pools by chain and hook address.  
 It returns the number of pools created with the given hook, along with the first block and timestamp where it appeared.
 ```sql
