@@ -11,8 +11,8 @@ Uniswap v4 introduces [Hooks](https://docs.uniswap.org/contracts/v4/concepts/hoo
   <img src="./docs/hooks-callbacks.png" alt="Uniswap v4 Hooks Lifecycle" width="800"/>
 </p>
 
-Here 
-Comparison across versions:  
+ 
+**Comparison across versions**  
 <table>
   <thead>
     <tr>
@@ -59,7 +59,7 @@ Comparison across versions:
 
 ## Exposed API
 `GET /hooks-adoptions?hook=0x000052423c1db6b7ff8641b85a7eefc7b2791888`
-This will output aggregated information about pools initialized with that hook:
+In the request we are filtering a Bunni hook, this will output aggregated information about pools initialized with that chain/hook:
 ```json
 {
   "hook": "0x000052423c1db6b7ff8641b85a7eefc7b2791888",
@@ -72,7 +72,7 @@ This will output aggregated information about pools initialized with that hook:
 ## Indexing Methodology
 [Dune SIM IDX](https://docs.sim.dune.com/idx) let us define **Solidity listeners** that react to Uniswap v4 PoolManger calls and events.
 We use `Main.sol` to:
-- Triggers on every `Initialize`, `Swap` or `ModifyLiquidity` event on Uniswap v4, we are listening to Unichain and Ethereum chains.
+- Triggers on every `Initialize`, `Swap` or `ModifyLiquidity` event on Uniswap v4 across both Unichain and Ethereum.
 ```solidity
 contract Triggers is BaseTriggers {
     function triggers() external virtual override {

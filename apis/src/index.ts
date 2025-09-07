@@ -1,7 +1,7 @@
 import { eq, sql , ne} from "drizzle-orm";
 import { poolInitialized, poolSwap, liquidityModified } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { types, db, App, middlewares } from "@duneanalytics/sim-idx"; // Import schema to ensure it's registered
-
+import { isValidAddress, isValidChainId } from "./validation"; // Utility functions for validation
 
 const Address = types.Address;
 
@@ -12,18 +12,31 @@ app.use("*", middlewares.authentication);
 
 
 // API endpoint for hook adoption statistics
-app.get("/api/hooks/adoption", async (c) => {
+app.get("/hooks/:hook/adoption", async (c) => {
   try {
+    const { hook } = c.req.param();
+    const { chain, limit } = c.req.query();
+    
+    if (!hook || !isValidAddress(hook)) {
+      return c.json({ error: "Invalid hook address" }, 400);
+    }
+
+    if (chain && !isValidChainId(chain)) {
+      return c.json({ error: "Invalid chain ID" }, 400);
+    }
+
     const result = await db.client(c)
     .select({
+      chain: poolInitialized.chainId,
       hook: poolInitialized.hooks,
       poolsCount: sql<number>`count(distinct ${poolInitialized.id})`.as("poolsCount"),
       firstSeenBlock: sql<number>`min(${poolInitialized.blockNumber})`.as("firstSeenBlock"),
       firstSeenTs: sql<number>`min(${poolInitialized.blockTimestamp})`.as("firstSeenTs"),
     })
     .from(poolInitialized)
-    .where(ne(poolInitialized.hooks, zeroAddress))
-    .groupBy(poolInitialized.hooks)
+    // .where(ne(poolInitialized.hooks, zeroAddress))
+    .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
+    .groupBy(poolInitialized.chainId, poolInitialized.hooks)
     .limit(100);
 
     return Response.json({ data: result });
@@ -34,43 +47,29 @@ app.get("/api/hooks/adoption", async (c) => {
 });
 
 
-
-
-// Test API for poolInitialized
-app.get("/poolInitialized", async (c) => {
+// API endpoint for hook adoption statistics
+app.get("/hooks/adoption", async (c) => {
   try {
-    const result = await db
-      .client(c)
-      .select()
-      .from(poolInitialized)
-      .limit(5);
+    const result = await db.client(c)
+    .select({
+      chain: poolInitialized.chainId,
+      hook: poolInitialized.hooks,
+      poolsCount: sql<number>`count(distinct ${poolInitialized.id})`.as("poolsCount"),
+      firstSeenBlock: sql<number>`min(${poolInitialized.blockNumber})`.as("firstSeenBlock"),
+      firstSeenTs: sql<number>`min(${poolInitialized.blockTimestamp})`.as("firstSeenTs"),
+    })
+    .from(poolInitialized)
+    .where(ne(poolInitialized.hooks, zeroAddress))
+    .groupBy(poolInitialized.chainId, poolInitialized.hooks)
+    .limit(100);
 
-    return Response.json({
-      result: result,
-    });
+    return Response.json({ data: result });
   } catch (e) {
     console.error("Database operation failed:", e);
     return Response.json({ error: (e as Error).message }, { status: 500 });
   }
 });
 
-// Test API for poolSwap
-app.get("/poolSwap", async (c) => {
-  try {
-    const result = await db
-      .client(c)
-      .select()
-      .from(poolSwap)
-      .limit(5);
-
-    return Response.json({
-      result: result,
-    });
-  } catch (e) {
-    console.error("Database operation failed:", e);
-    return Response.json({ error: (e as Error).message }, { status: 500 });
-  }
-});
 
 // Test API for liquidityModified
 app.get("/liquidityModified", async (c) => {
