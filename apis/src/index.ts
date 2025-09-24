@@ -1,17 +1,13 @@
 import { eq, sql , ne} from "drizzle-orm";
 import { poolInitialized, poolSwap, liquidityModified } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { types, db, App, middlewares } from "@duneanalytics/sim-idx"; // Import schema to ensure it's registered
-import { isValidAddress, isValidChainId } from "./validation"; // Utility functions for validation
-
-const Address = types.Address;
-
-const zeroAddress = Address.from("0000000000000000000000000000000000000000");
+import { isValidAddress, isValidChainId, zeroAddress, Address } from "./validation"; // Utility functions for validation
 
 const app = App.create();
 app.use("*", middlewares.authentication);
 
 
-// API endpoint for hook adoption statistics
+// API endpoint for hook adoption statisticss
 app.get("/hooks/:hook/adoption", async (c) => {
   try {
     const { hook } = c.req.param();
@@ -34,7 +30,6 @@ app.get("/hooks/:hook/adoption", async (c) => {
       firstSeenTs: sql<number>`min(${poolInitialized.blockTimestamp})`.as("firstSeenTs"),
     })
     .from(poolInitialized)
-    // .where(ne(poolInitialized.hooks, zeroAddress))
     .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
     .groupBy(poolInitialized.chainId, poolInitialized.hooks)
     .limit(100);
