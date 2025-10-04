@@ -1,4 +1,4 @@
-# 🦄 Uniswap v4 Indexer (Dune SIM IDX)
+# 🦄 Uniswap v4 Indexer (Dune SIM IDX) _ongoing_
 
 This project uses [Dune SIM IDX](https://docs.sim.dune.com/idx) to **index Uniswap v4 PoolManager events** directly in Solidity, 
 and expose APIs for hook adoption and usage analytics.
