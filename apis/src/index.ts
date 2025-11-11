@@ -1,5 +1,6 @@
 import { eq, sql , ne} from "drizzle-orm";
-import { poolInitialized, poolSwap, liquidityModified } from "./db/schema/Listener"; // Adjust the import path as necessary
+// import { poolInitialized, poolSwap, liquidityModified } from "./db/schema/Listener"; // Adjust the import path as necessary
+import { poolInitialized, poolSwap } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { types, db, App, middlewares } from "@duneanalytics/sim-idx"; // Import schema to ensure it's registered
 import { isValidAddress, isValidChainId, zeroAddress, Address } from "./validation"; // Utility functions for validation
 
@@ -42,23 +43,23 @@ app.get("/hooks/:hook/adoption", async (c) => {
 });
 
 
-// Test API for liquidityModified
-app.get("/liquidityModified", async (c) => {
-  try {
-    const result = await db
-      .client(c)
-      .select()
-      .from(liquidityModified)
-      .limit(5);
+// // Test API for liquidityModified
+// app.get("/liquidityModified", async (c) => {
+//   try {
+//     const result = await db
+//       .client(c)
+//       .select()
+//       .from(liquidityModified)
+//       .limit(5);
 
-    return Response.json({
-      result: result,
-    });
-  } catch (e) {
-    console.error("Database operation failed:", e);
-    return Response.json({ error: (e as Error).message }, { status: 500 });
-  }
-});
+//     return Response.json({
+//       result: result,
+//     });
+//   } catch (e) {
+//     console.error("Database operation failed:", e);
+//     return Response.json({ error: (e as Error).message }, { status: 500 });
+//   }
+// });
 
 
 app.get("/*", async (c) => {

@@ -55,9 +55,9 @@ import "sim-idx-generated/Generated.sol";
 //                                                      444
 
 
-// contract PoolManagerListener is PoolManager$OnInitializeEvent , PoolManager$OnSwapEvent {
+contract PoolManagerListener is PoolManager$OnInitializeEvent , PoolManager$OnSwapEvent {
 
- contract PoolManagerListener is PoolManager$OnInitializeEvent , PoolManager$OnSwapEvent, PoolManager$OnModifyLiquidityEvent {
+//  contract PoolManagerListener is PoolManager$OnInitializeEvent , PoolManager$OnSwapEvent, PoolManager$OnModifyLiquidityEvent {
     event PoolInitialized(
         uint64 chainId,
         bytes32 txnHash,
@@ -89,18 +89,18 @@ import "sim-idx-generated/Generated.sol";
         uint24 fee
     );
 
-    event LiquidityModified(
-        uint64 chainId,
-        bytes32 txnHash,
-        uint256 blockNumber,
-        uint256 blockTimestamp,
-        bytes32 id,
-        address sender,
-        int24 tickLower,
-        int24 tickUpper,
-        int256 liquidityDelta,
-        bytes32 salt
-    );
+    // event LiquidityModified(
+    //     uint64 chainId,
+    //     bytes32 txnHash,
+    //     uint256 blockNumber,
+    //     uint256 blockTimestamp,
+    //     bytes32 id,
+    //     address sender,
+    //     int24 tickLower,
+    //     int24 tickUpper,
+    //     int256 liquidityDelta,
+    //     bytes32 salt
+    // );
 
 
     function onInitializeEvent(
@@ -143,22 +143,22 @@ import "sim-idx-generated/Generated.sol";
         );
     }
 
-    function onModifyLiquidityEvent(
-        EventContext memory ctx,
-        PoolManager$ModifyLiquidityEventParams memory inputs
-     ) external override {
-        emit LiquidityModified(
-            uint64(block.chainid),
-            ctx.txn.hash(),
-            blockNumber(),
-            block.timestamp,
-            inputs.id,
-            inputs.sender,
-            inputs.tickLower,
-            inputs.tickUpper,
-            inputs.liquidityDelta,
-            inputs.salt
-        );
-    }
+    // function onModifyLiquidityEvent(
+    //     EventContext memory ctx,
+    //     PoolManager$ModifyLiquidityEventParams memory inputs
+    //  ) external override {
+    //     emit LiquidityModified(
+    //         uint64(block.chainid),
+    //         ctx.txn.hash(),
+    //         blockNumber(),
+    //         block.timestamp,
+    //         inputs.id,
+    //         inputs.sender,
+    //         inputs.tickLower,
+    //         inputs.tickUpper,
+    //         inputs.liquidityDelta,
+    //         inputs.salt
+    //     );
+    // }
 
 }
