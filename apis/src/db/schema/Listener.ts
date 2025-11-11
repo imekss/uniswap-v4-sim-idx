@@ -3,19 +3,6 @@ import { pgEnum, pgTable as table } from "drizzle-orm/pg-core";
 import * as t from "drizzle-orm/pg-core";
 import { db, types } from "@duneanalytics/sim-idx";
 
-export const liquidityModified = table("liquidity_modified", {
-  chainId: db.uint64('chain_id'),
-  txnHash: db.bytes32('txn_hash'),
-  blockNumber: db.uint256('block_number'),
-  blockTimestamp: db.uint256('block_timestamp'),
-  id: db.bytes32('id'),
-  sender: db.address('sender'),
-  tickLower: db.int24('tick_lower'),
-  tickUpper: db.int24('tick_upper'),
-  liquidityDelta: db.int256('liquidity_delta'),
-  salt: db.bytes32('salt'),
-})
-
 export const poolInitialized = table("pool_initialized", {
   chainId: db.uint64('chain_id'),
   txnHash: db.bytes32('txn_hash'),
