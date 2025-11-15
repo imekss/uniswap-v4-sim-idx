@@ -42,6 +42,49 @@ app.get("/hooks/:hook/adoption", async (c) => {
   }
 });
 
+// API endpoint for hook swaps + volume statistics
+app.get("/hooks/:hook/activity", async (c) => {
+  try {
+    const { hook } = c.req.param();
+
+    if (!hook || !isValidAddress(hook)) {
+      return c.json({ error: "Invalid hook address" }, 400);
+    }
+
+
+    const result = await db
+      .client(c)
+      .select({
+        chain: poolInitialized.chainId,
+        hook: poolInitialized.hooks,
+        swapsCount: sql<number>`count(*)`.as("swapsCount"),
+        // raw token volumes (signed int128 -> absolute value)
+        volumeToken0: sql<string>`sum(abs(${poolSwap.amount0}))`.as(
+          "volumeToken0"
+        ),
+        volumeToken1: sql<string>`sum(abs(${poolSwap.amount1}))`.as(
+          "volumeToken1"
+        ),
+      })
+      .from(poolSwap)
+      .innerJoin(
+        poolInitialized,
+        and(
+          eq(poolSwap.id, poolInitialized.id),
+          eq(poolSwap.chainId, poolInitialized.chainId)
+        )
+      )
+      .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
+      .groupBy(poolInitialized.chainId, poolInitialized.hooks)
+      .limit(100);
+
+    return Response.json({ data: result });
+  } catch (e) {
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+});
+
 
 // // Test API for liquidityModified
 // app.get("/liquidityModified", async (c) => {
