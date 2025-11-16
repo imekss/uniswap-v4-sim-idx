@@ -37,7 +37,6 @@ app.get("/hooks/:hook/poolinit", async (c) => {
 app.get("/id/:id/poolswap", async (c) => {
   try {
     const { id } = c.req.param();  
-    const idBytes = Buffer.from(id.replace(/^0x/, ""), "hex");
 
     const result = await db.client(c)
     .select({
@@ -48,7 +47,7 @@ app.get("/id/:id/poolswap", async (c) => {
        amount1: poolSwap.amount1
     })
     .from(poolSwap)
-    .where(eq(poolSwap.id, idBytes as any))
+    .where(eq(poolSwap.id, id as any))
     .limit(100);
 
     return Response.json({ data: result });
