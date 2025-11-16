@@ -19,7 +19,7 @@ app.get("/hooks/:hook/poolinit", async (c) => {
     const result = await db.client(c)
     .select({
        chain: poolInitialized.chainId,
-       hook: poolInitialized.hooks,
+       hook: poolInitialized.hooks
     })
     .from(poolInitialized)
     .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
