@@ -34,9 +34,16 @@ app.get("/hooks/:hook/poolinit", async (c) => {
 });
 
 // Pool swaps by pool ID
-app.get("/id/:id/poolswap", async (c) => {
+app.get("/poolswap1", async (c) => {
   try {
     // const { id } = c.req.param();  
+
+        // Hex without 0x
+    const rawHex =
+      "0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd";
+
+    const idBytes = Buffer.from(rawHex, "hex") as unknown as Bytes;
+
 
     const result = await db.client(c)
     .select({
@@ -47,8 +54,8 @@ app.get("/id/:id/poolswap", async (c) => {
        amount1: poolSwap.amount1
     })
     .from(poolSwap)
-    // .where(eq(poolSwap.id, id as any))
-    // .where(sql`${poolSwap.id} = ${id}`)
+    // .where(eq(poolSwap.id, Address.from('0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd')))
+    .where(eq(poolSwap.id, idBytes))
     .limit(10);
 
     return Response.json({ data: result });
@@ -57,6 +64,41 @@ app.get("/id/:id/poolswap", async (c) => {
     return Response.json({ error: (e as Error).message }, { status: 500 });
   }
 });
+
+// Pool swaps by pool ID
+app.get("/poolswap", async (c) => {
+  try {
+    // const { id } = c.req.param();  
+
+        // Hex without 0x
+    const rawHex =
+      "9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd";
+
+    const idBytes = Buffer.from(rawHex, "hex") as unknown as Bytes;
+
+
+    const result = await db.client(c)
+    .select({
+       id:  poolSwap.id,
+       chain: poolSwap.chainId,
+       txnHash: poolSwap.txnHash,
+       amount0: poolSwap.amount0,
+       amount1: poolSwap.amount1
+    })
+    .from(poolSwap)
+    // .where(eq(poolSwap.id, Address.from('0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd')))
+    .where(eq(poolSwap.id, idBytes))
+    .limit(10);
+
+    return Response.json({ data: result });
+  } catch (e) {
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+});
+    // .where(eq(poolSwap.id, '0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd'))
+
+
 
 // API endpoint for hook adoption statisticss
 app.get("/hooks/:hook/adoption", async (c) => {
