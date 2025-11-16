@@ -1,4 +1,4 @@
-import { eq, sql , ne} from "drizzle-orm";
+import { eq, sql , ne, and} from "drizzle-orm";
 // import { poolInitialized, poolSwap, liquidityModified } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { poolInitialized, poolSwap } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { types, db, App, middlewares } from "@duneanalytics/sim-idx"; // Import schema to ensure it's registered
@@ -50,7 +50,7 @@ app.get("/hooks/:hook/activity", async (c) => {
     if (!hook || !isValidAddress(hook)) {
       return c.json({ error: "Invalid hook address" }, 400);
     }
-
+    
 
     const result = await db.client(c)
       .select({
