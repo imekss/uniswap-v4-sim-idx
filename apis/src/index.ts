@@ -22,14 +22,7 @@ app.get("/hooks/:hook/poolinit", async (c) => {
     }
 
     const result = await db.client(c)
-    .select({
-      id: poolInitialized.id,
-      chain: poolInitialized.chainId,
-      hook: poolInitialized.hooks,
-      poolsCount: sql<number>`count(distinct ${poolInitialized.id})`.as("poolsCount"),
-      firstSeenBlock: sql<number>`min(${poolInitialized.blockNumber})`.as("firstSeenBlock"),
-      firstSeenTs: sql<number>`min(${poolInitialized.blockTimestamp})`.as("firstSeenTs"),
-    })
+    .select()
     .from(poolInitialized)
     .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
     .limit(100);
