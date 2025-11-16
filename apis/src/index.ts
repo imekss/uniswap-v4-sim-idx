@@ -7,6 +7,58 @@ import { isValidAddress, isValidChainId, zeroAddress, Address } from "./validati
 const app = App.create();
 app.use("*", middlewares.authentication);
 
+// API endpoint for hook adoption statisticss
+app.get("/hooks/:hook/poolinit", async (c) => {
+  try {
+    const { hook } = c.req.param();
+    const { chain, limit } = c.req.query();
+    
+    if (!hook || !isValidAddress(hook)) {
+      return c.json({ error: "Invalid hook address" }, 400);
+    }
+
+    if (chain && !isValidChainId(chain)) {
+      return c.json({ error: "Invalid chain ID" }, 400);
+    }
+
+    const result = await db.client(c)
+    .select({
+      id: poolInitialized.id,
+      chain: poolInitialized.chainId,
+      hook: poolInitialized.hooks,
+      poolsCount: sql<number>`count(distinct ${poolInitialized.id})`.as("poolsCount"),
+      firstSeenBlock: sql<number>`min(${poolInitialized.blockNumber})`.as("firstSeenBlock"),
+      firstSeenTs: sql<number>`min(${poolInitialized.blockTimestamp})`.as("firstSeenTs"),
+    })
+    .from(poolInitialized)
+    .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
+    .limit(100);
+
+    return Response.json({ data: result });
+  } catch (e) {
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+});
+
+// API endpoint for hook adoption statisticss
+app.get("/id/:id/poolswap", async (c) => {
+  try {
+    const { id } = c.req.param();  
+    const idBytes = Buffer.from(id.replace(/^0x/, ""), "hex");
+
+    const result = await db.client(c)
+    .select()
+    .from(poolSwap)
+    .where(eq(poolSwap.id, idBytes as any))
+    .limit(100);
+
+    return Response.json({ data: result });
+  } catch (e) {
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+});
 
 // API endpoint for hook adoption statisticss
 app.get("/hooks/:hook/adoption", async (c) => {
