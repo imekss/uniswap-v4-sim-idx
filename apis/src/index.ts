@@ -47,7 +47,8 @@ app.get("/id/:id/poolswap", async (c) => {
        amount1: poolSwap.amount1
     })
     .from(poolSwap)
-    .where(eq(poolSwap.id, id as any))
+    // .where(eq(poolSwap.id, id as any))
+    .where(sql`${poolSwap.id} = ${id}`)
     .limit(100);
 
     return Response.json({ data: result });
