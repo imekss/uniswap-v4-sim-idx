@@ -18,6 +18,7 @@ app.get("/hooks/:hook/poolinit", async (c) => {
 
     const result = await db.client(c)
     .select({
+       id: poolInitialized.id,
        chain: poolInitialized.chainId,
        hook: poolInitialized.hooks
     })
@@ -39,7 +40,13 @@ app.get("/id/:id/poolswap", async (c) => {
     const idBytes = Buffer.from(id.replace(/^0x/, ""), "hex");
 
     const result = await db.client(c)
-    .select()
+    .select({
+       id:  poolSwap.id,
+       chain: poolSwap.chainId,
+       txnHash: poolSwap.txnHash,
+       amount0: poolSwap.amount0,
+       amount1: poolSwap.amount1
+    }
     .from(poolSwap)
     .where(eq(poolSwap.id, idBytes as any))
     .limit(100);
