@@ -46,7 +46,7 @@ app.get("/id/:id/poolswap", async (c) => {
        txnHash: poolSwap.txnHash,
        amount0: poolSwap.amount0,
        amount1: poolSwap.amount1
-    }
+    })
     .from(poolSwap)
     .where(eq(poolSwap.id, idBytes as any))
     .limit(100);
