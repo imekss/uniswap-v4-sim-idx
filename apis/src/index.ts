@@ -7,22 +7,20 @@ import { isValidAddress, isValidChainId, zeroAddress, Address } from "./validati
 const app = App.create();
 app.use("*", middlewares.authentication);
 
-// API endpoint for hook adoption statisticss
+// Pool Init by Hook
 app.get("/hooks/:hook/poolinit", async (c) => {
   try {
     const { hook } = c.req.param();
-    const { chain, limit } = c.req.query();
-    
+
     if (!hook || !isValidAddress(hook)) {
       return c.json({ error: "Invalid hook address" }, 400);
     }
 
-    if (chain && !isValidChainId(chain)) {
-      return c.json({ error: "Invalid chain ID" }, 400);
-    }
-
     const result = await db.client(c)
-    .select()
+    .select({
+       chain: poolInitialized.chainId,
+       hook: poolInitialized.hooks,
+    })
     .from(poolInitialized)
     .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
     .limit(100);
@@ -34,7 +32,7 @@ app.get("/hooks/:hook/poolinit", async (c) => {
   }
 });
 
-// API endpoint for hook adoption statisticss
+// Pool swaps by pool ID
 app.get("/id/:id/poolswap", async (c) => {
   try {
     const { id } = c.req.param();  
