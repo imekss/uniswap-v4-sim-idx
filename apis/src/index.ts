@@ -36,7 +36,7 @@ app.get("/hooks/:hook/poolinit", async (c) => {
 // Pool swaps by pool ID
 app.get("/id/:id/poolswap", async (c) => {
   try {
-    const { id } = c.req.param();  
+    // const { id } = c.req.param();  
 
     const result = await db.client(c)
     .select({
@@ -48,8 +48,8 @@ app.get("/id/:id/poolswap", async (c) => {
     })
     .from(poolSwap)
     // .where(eq(poolSwap.id, id as any))
-    .where(sql`${poolSwap.id} = ${id}`)
-    .limit(100);
+    // .where(sql`${poolSwap.id} = ${id}`)
+    .limit(10);
 
     return Response.json({ data: result });
   } catch (e) {
@@ -62,14 +62,9 @@ app.get("/id/:id/poolswap", async (c) => {
 app.get("/hooks/:hook/adoption", async (c) => {
   try {
     const { hook } = c.req.param();
-    const { chain, limit } = c.req.query();
     
     if (!hook || !isValidAddress(hook)) {
       return c.json({ error: "Invalid hook address" }, 400);
-    }
-
-    if (chain && !isValidChainId(chain)) {
-      return c.json({ error: "Invalid chain ID" }, 400);
     }
 
     const result = await db.client(c)
@@ -102,6 +97,18 @@ app.get("/hooks/:hook/activity", async (c) => {
     }
     
 
+    // const swaps = await db.client(c)
+    // .select({
+    //   chain: poolSwap.id,
+    //   swapsCount: sql<number>`count(*)`.as("swapsCount"),
+    //   volumeToken0: sql<string>`sum(abs(${poolSwap.amount0}))`.as("volumeToken0"),
+    //   volumeToken1: sql<string>`sum(abs(${poolSwap.amount1}))`.as( "volumeToken1"),
+    // })
+    // .from(poolSwap)
+    // // .where(eq(poolSwap.id, hook.toLowerCase()))
+    // .groupBy(poolSwap.id)
+      
+
     const result = await db.client(c)
       .select({
         chain: poolInitialized.chainId,
@@ -129,6 +136,7 @@ app.get("/hooks/:hook/activity", async (c) => {
     return Response.json({ error: (e as Error).message }, { status: 500 });
   }
 });
+
 
 
 // // Test API for liquidityModified
