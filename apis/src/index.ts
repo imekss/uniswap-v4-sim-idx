@@ -52,26 +52,21 @@ app.get("/hooks/:hook/activity", async (c) => {
     }
 
 
-    const result = await db
-      .client(c)
+    const result = await db.client(c)
       .select({
         chain: poolInitialized.chainId,
         hook: poolInitialized.hooks,
         swapsCount: sql<number>`count(*)`.as("swapsCount"),
         // raw token volumes (signed int128 -> absolute value)
-        volumeToken0: sql<string>`sum(abs(${poolSwap.amount0}))`.as(
-          "volumeToken0"
-        ),
-        volumeToken1: sql<string>`sum(abs(${poolSwap.amount1}))`.as(
-          "volumeToken1"
-        ),
+        volumeToken0: sql<string>`sum(abs(${poolSwap.amount0}))`.as("volumeToken0"),
+        volumeToken1: sql<string>`sum(abs(${poolSwap.amount1}))`.as( "volumeToken1"),
       })
-      .from(poolSwap)
+      .from(poolInitialized)
       .innerJoin(
-        poolInitialized,
+        poolSwap,
         and(
-          eq(poolSwap.id, poolInitialized.id),
-          eq(poolSwap.chainId, poolInitialized.chainId)
+          eq(poolInitialized.id, poolSwap.id),
+          eq(poolInitialized.chainId, poolSwap.chainId)
         )
       )
       .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
