@@ -53,21 +53,19 @@ app.get("/totalHooks", async (c) => {
   }
 });
 
-// Total Swap by Id, Chain
+// Total Swap by Id/Chain
 app.get("/totalPool", async (c) => {
   try {
 
     const poolInit = await db.client(c)
     .select({ 
-      chainId: poolInitialized.chainId
-      // ,
-      // totPool: sql<number>`count(distinct ${poolInitialized.id})`.as("totPool")
+      chainId: poolInitialized.chainId,
+      totPool: sql<number>`count(distinct ${poolInitialized.id})`.as("totPool")
       // chainId: poolInitialized.chainId,
       // totPool: sql<number>`count(*)`
     })
     .from(poolInitialized)
-    // .groupBy(poolInitialized.chainId)
-    
+    .groupBy(poolInitialized.chainId)
     .limit(100);
 
     return Response.json( { data: poolInit } );
