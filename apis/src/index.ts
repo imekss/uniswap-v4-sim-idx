@@ -33,6 +33,50 @@ app.get("/hooks/:hook/poolinit", async (c) => {
   }
 });
 
+// Total hooks
+app.get("/totalHooks", async (c) => {
+  try {
+
+    const result = await db.client(c)
+    .select({
+
+       hook: poolInitialized.hooks
+    })
+    .from(poolInitialized)
+    .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
+    .limit(100);
+
+    return Response.json({ data: result });
+  } catch (e) {
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+});
+
+// Total Swap by Id, Chain
+app.get("/totalPool", async (c) => {
+  try {
+    const poolInit = await db.client(c)
+    .select({ 
+      chainId: poolInitialized.chainId,
+      totPool: sql<number>`count(*)`
+    })
+    .groupBy(poolInitialized.chainId)
+    .from(poolInitialized)
+    .limit(100);
+
+    return Response.json({data: poolInit});
+
+  }
+  catch(e){
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+}
+);
+
+
+
 // Pool swaps by pool ID
 app.get("/poolswap1", async (c) => {
   try {
@@ -49,13 +93,16 @@ app.get("/poolswap1", async (c) => {
     .select({
        id:  poolSwap.id,
        chain: poolSwap.chainId,
-       txnHash: poolSwap.txnHash,
-       amount0: poolSwap.amount0,
-       amount1: poolSwap.amount1
+      //  txnHash: poolSwap.txnHash,
+       volumeToken0: sql<string>`sum(abs(${poolSwap.amount0}))`.as("volumeToken0"),
+       volumeToken1: sql<string>`sum(abs(${poolSwap.amount0}))`.as("volumeToken1"),
+      //  amount0: poolSwap.amount0,
+      //  amount1: poolSwap.amount1
     })
     .from(poolSwap)
     // .where(eq(poolSwap.id, Address.from('0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd')))
-    .where(eq(poolSwap.id, idBytes))
+    // .where(eq(poolSwap.id, idBytes))
+    .groupBy(poolSwap.id, poolSwap.chainId)
     .limit(10);
 
     return Response.json({ data: result });
@@ -68,15 +115,7 @@ app.get("/poolswap1", async (c) => {
 // Pool swaps by pool ID
 app.get("/poolswap", async (c) => {
   try {
-    // const { id } = c.req.param();  
-
-        // Hex without 0x
-    const rawHex =
-      "9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd";
-
-    const idBytes = Buffer.from(rawHex, "hex") as unknown as Bytes;
-
-
+    
     const result = await db.client(c)
     .select({
        id:  poolSwap.id,
@@ -86,8 +125,7 @@ app.get("/poolswap", async (c) => {
        amount1: poolSwap.amount1
     })
     .from(poolSwap)
-    // .where(eq(poolSwap.id, Address.from('0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd')))
-    .where(eq(poolSwap.id, idBytes))
+    .groupBy(poolInitialized.chainId, poolInitialized.hooks)
     .limit(10);
 
     return Response.json({ data: result });
