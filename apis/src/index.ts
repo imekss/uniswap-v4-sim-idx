@@ -66,7 +66,8 @@ app.get("/totalPool", async (c) => {
       // totPool: sql<number>`count(*)`
     })
     .from(poolInitialized)
-    .groupBy(poolInitialized.chainId)
+    // .groupBy(poolInitialized.chainId)
+    
     .limit(100);
 
     return Response.json( { data: poolInit } );
