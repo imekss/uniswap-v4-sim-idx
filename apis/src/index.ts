@@ -60,7 +60,8 @@ app.get("/totalPool", async (c) => {
     const poolInit = await db.client(c)
     .select({ 
       chainId: poolInitialized.chainId,
-      totPool: sql<number>`count(distinct ${poolInitialized.id})`.as("totPool")
+      totPools: sql<number>`count(distinct ${poolInitialized.id})`.as("totPools"),
+      totHooks: sql<number>`count(distinct ${poolInitialized.hooks})`.as("totHooks")
       // chainId: poolInitialized.chainId,
       // totPool: sql<number>`count(*)`
     })
