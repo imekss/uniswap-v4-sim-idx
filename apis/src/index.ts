@@ -45,7 +45,7 @@ app.get("/totalsSwap", async (c) => {
     .from(poolSwap)
     .groupBy(poolSwap.chainId);
 
-    return Response.json( { data: poolSwap } );
+    return Response.json( { data: poolSwapSub } );
 
   }
   catch(e){
