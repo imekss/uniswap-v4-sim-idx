@@ -51,14 +51,15 @@ app.get("/totalsByChain", async (c) => {
     .select({ 
       chainId: poolInitialized.chainId,
       totPools: sql<number>`count(distinct ${poolInitialized.id})`.as("totPools"),
-      totHooks: sql<number>`count(distinct ${poolInitialized.hooks})`.as("totHooks"),
-      totSwaps: sql<number>`coalesce(sum(${poolSwapSub.totSwaps}), 0)`.as("totSwaps"),
+      totHooks: sql<number>`count(distinct ${poolInitialized.hooks})`.as("totHooks")
+      // ,
+      // totSwaps: sql<number>`coalesce(sum(${poolSwapSub.totSwaps}), 0)`.as("totSwaps"),
     })
     .from(poolInitialized)
-      .leftJoin(
-        poolSwapSub,
-          eq(poolInitialized.chainId, poolSwapSub.chainId)
-      )
+    //   .leftJoin(
+    //     poolSwapSub,
+    //       eq(poolInitialized.chainId, poolSwapSub.chainId)
+    //   )
     .groupBy(poolInitialized.chainId);
 
     return Response.json( { data: poolInit } );

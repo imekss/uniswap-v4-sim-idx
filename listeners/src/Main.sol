@@ -11,7 +11,7 @@ contract Triggers is BaseTriggers {
     function triggers() external virtual override {
         PoolManagerListener listener = new PoolManagerListener();
 
-        // ETHEREUMM
+        // ETHEREUM
         addTrigger(chainContract(Chains.Ethereum, POOLMANAGER_ETHEREUM),listener.triggerOnInitializeEvent());
         addTrigger(chainContract(Chains.Ethereum, POOLMANAGER_ETHEREUM),listener.triggerOnSwapEvent());
 
@@ -50,9 +50,9 @@ contract Triggers is BaseTriggers {
         addTrigger(chainContract(Chains.Zora, POOLMANAGER_ZORA),listener.triggerOnSwapEvent());
 
 
-        // // WORLDCOIN
-        // addTrigger(chainContract(Chains.Worldcoin, POOLMANAGER_WORLDCOIN),listener.triggerOnInitializeEvent());
-        // addTrigger(chainContract(Chains.Worldcoin, POOLMANAGER_WORLDCOIN),listener.triggerOnSwapEvent());
+        // WORLD
+        addTrigger(chainContract(Chains.WorldChain, POOLMANAGER_WORLDCOIN),listener.triggerOnInitializeEvent());
+        addTrigger(chainContract(Chains.WorldChain, POOLMANAGER_WORLDCOIN),listener.triggerOnSwapEvent());
 
 
         // INK
