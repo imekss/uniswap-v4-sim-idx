@@ -30,24 +30,24 @@ contract Triggers is BaseTriggers {
         addTrigger(chainContract(Chains.Base, POOLMANAGER_BASE),listener.triggerOnSwapEvent());
 
 
-        // // ARBITRUM
-        // addTrigger(chainContract(Chains.Arbitrum, POOLMANAGER_ARBITRUM),listener.triggerOnInitializeEvent());
-        // addTrigger(chainContract(Chains.Arbitrum, POOLMANAGER_ARBITRUM),listener.triggerOnSwapEvent());
+        // ARBITRUM
+        addTrigger(chainContract(Chains.Arbitrum, POOLMANAGER_ARBITRUM),listener.triggerOnInitializeEvent());
+        addTrigger(chainContract(Chains.Arbitrum, POOLMANAGER_ARBITRUM),listener.triggerOnSwapEvent());
 
 
         // // POLYGON
-        // addTrigger(chainContract(Chains.Polygon, POOLMANAGER_POLYGON),listener.triggerOnInitializeEvent());
+        // addTrigger(chainContract(Chains., POOLMANAGER_POLYGON),listener.triggerOnInitializeEvent());
         // addTrigger(chainContract(Chains.Polygon, POOLMANAGER_POLYGON),listener.triggerOnSwapEvent());   
 
 
         // // BLAST
-        // addTrigger(chainContract(Chains.Blast, POOLMANAGER_BLAST),listener.triggerOnInitializeEvent());
+        // addTrigger(chainContract(Chains., POOLMANAGER_BLAST),listener.triggerOnInitializeEvent());
         // addTrigger(chainContract(Chains.Blast, POOLMANAGER_BLAST),listener.triggerOnSwapEvent());   
 
 
-        // // ZORA 
-        // addTrigger(chainContract(Chains.Zora, POOLMANAGER_ZORA),listener.triggerOnInitializeEvent());
-        // addTrigger(chainContract(Chains.Zora, POOLMANAGER_ZORA),listener.triggerOnSwapEvent());
+        // ZORA 
+        addTrigger(chainContract(Chains.Zora, POOLMANAGER_ZORA),listener.triggerOnInitializeEvent());
+        addTrigger(chainContract(Chains.Zora, POOLMANAGER_ZORA),listener.triggerOnSwapEvent());
 
 
         // // WORLDCOIN
@@ -55,14 +55,14 @@ contract Triggers is BaseTriggers {
         // addTrigger(chainContract(Chains.Worldcoin, POOLMANAGER_WORLDCOIN),listener.triggerOnSwapEvent());
 
 
-        // // INK
-        // addTrigger(chainContract(Chains.Ink, POOLMANAGER_INK),listener.triggerOnInitializeEvent());
-        // addTrigger(chainContract(Chains.Ink, POOLMANAGER_INK),listener.triggerOnSwapEvent());
+        // INK
+        addTrigger(chainContract(Chains.Ink, POOLMANAGER_INK),listener.triggerOnInitializeEvent());
+        addTrigger(chainContract(Chains.Ink, POOLMANAGER_INK),listener.triggerOnSwapEvent());
 
 
-        // // SONEIUM
-        // addTrigger(chainContract(Chains.Soneium, POOLMANAGER_SONEIUM),listener.triggerOnInitializeEvent());
-        // addTrigger(chainContract(Chains.Soneium, POOLMANAGER_SONEIUM),listener.triggerOnSwapEvent());
+        // SONEIUM
+        addTrigger(chainContract(Chains.Soneium, POOLMANAGER_SONEIUM),listener.triggerOnInitializeEvent());
+        addTrigger(chainContract(Chains.Soneium, POOLMANAGER_SONEIUM),listener.triggerOnSwapEvent());
 
 
         // // AVALANCHE
