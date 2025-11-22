@@ -1,10 +1,11 @@
-import { eq, sql , ne, and } from "drizzle-orm";
+import { eq, sql , ne, and , count} from "drizzle-orm";
 // import { poolInitialized, poolSwap, liquidityModified } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { poolInitialized, poolSwap } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { types, db, App, middlewares } from "@duneanalytics/sim-idx"; // Import schema to ensure it's registered
 import { isValidAddress, isValidChainId, zeroAddress, Address } from "./validation"; // Utility functions for validation
 
 const app = App.create();
+
 app.use("*", middlewares.authentication);
 
 // Pool Init by Hook
@@ -33,41 +34,32 @@ app.get("/hooks/:hook/poolinit", async (c) => {
   }
 });
 
-// Total hooks
-app.get("/totalHooks", async (c) => {
+
+// Total Pools/Swap/Hooks by Chain
+app.get("/totalsByChain", async (c) => {
   try {
-
-    const result = await db.client(c)
-    .select({
-
-       hook: poolInitialized.hooks
+    const poolSwapSub =  db.client(c)
+    .select({ 
+      chainId: poolSwap.chainId,
+      totSwaps: count().as("totSwaps")
     })
-    .from(poolInitialized)
-    // .where(eq(poolInitialized.hooks, Address.from(hook.toLowerCase())))
-    .limit(100);
-
-    return Response.json({ data: result });
-  } catch (e) {
-    console.error("Database operation failed:", e);
-    return Response.json({ error: (e as Error).message }, { status: 500 });
-  }
-});
-
-// Total Swap by Id/Chain
-app.get("/totalPool", async (c) => {
-  try {
+    .from(poolSwap)
+    .groupBy(poolSwap.chainId)
+    .as("poolSwap_t");
 
     const poolInit = await db.client(c)
     .select({ 
       chainId: poolInitialized.chainId,
       totPools: sql<number>`count(distinct ${poolInitialized.id})`.as("totPools"),
-      totHooks: sql<number>`count(distinct ${poolInitialized.hooks})`.as("totHooks")
-      // chainId: poolInitialized.chainId,
-      // totPool: sql<number>`count(*)`
+      totHooks: sql<number>`count(distinct ${poolInitialized.hooks})`.as("totHooks"),
+      totSwaps: sql<number>`coalesce(sum(${poolSwapSub.totSwaps}), 0)`.as("totSwaps"),
     })
     .from(poolInitialized)
-    .groupBy(poolInitialized.chainId)
-    .limit(100);
+      .leftJoin(
+        poolSwapSub,
+          eq(poolInitialized.chainId, poolSwapSub.chainId)
+      )
+    .groupBy(poolInitialized.chainId);
 
     return Response.json( { data: poolInit } );
 
@@ -79,66 +71,6 @@ app.get("/totalPool", async (c) => {
 }
 );
 
-
-
-// Pool swaps by pool ID
-app.get("/poolswap1", async (c) => {
-  try {
-    // const { id } = c.req.param();  
-
-        // Hex without 0x
-    const rawHex =
-      "0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd";
-
-    const idBytes = Buffer.from(rawHex, "hex") as unknown as Bytes;
-
-
-    const result = await db.client(c)
-    .select({
-       id:  poolSwap.id,
-       chain: poolSwap.chainId,
-      //  txnHash: poolSwap.txnHash,
-       volumeToken0: sql<string>`sum(abs(${poolSwap.amount0}))`.as("volumeToken0"),
-       volumeToken1: sql<string>`sum(abs(${poolSwap.amount0}))`.as("volumeToken1"),
-      //  amount0: poolSwap.amount0,
-      //  amount1: poolSwap.amount1
-    })
-    .from(poolSwap)
-    // .where(eq(poolSwap.id, Address.from('0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd')))
-    // .where(eq(poolSwap.id, idBytes))
-    .groupBy(poolSwap.id, poolSwap.chainId)
-    .limit(10);
-
-    return Response.json({ data: result });
-  } catch (e) {
-    console.error("Database operation failed:", e);
-    return Response.json({ error: (e as Error).message }, { status: 500 });
-  }
-});
-
-// Pool swaps by pool ID
-app.get("/poolswap", async (c) => {
-  try {
-    
-    const result = await db.client(c)
-    .select({
-       id:  poolSwap.id,
-       chain: poolSwap.chainId,
-       txnHash: poolSwap.txnHash,
-       amount0: poolSwap.amount0,
-       amount1: poolSwap.amount1
-    })
-    .from(poolSwap)
-    .groupBy(poolInitialized.chainId, poolInitialized.hooks)
-    .limit(10);
-
-    return Response.json({ data: result });
-  } catch (e) {
-    console.error("Database operation failed:", e);
-    return Response.json({ error: (e as Error).message }, { status: 500 });
-  }
-});
-    // .where(eq(poolSwap.id, '0x9bdd72519ad7e2b5f0d5441d7af389771cc04a8406cd577fac0c68a8b6b396bd'))
 
 
 
@@ -181,18 +113,6 @@ app.get("/hooks/:hook/activity", async (c) => {
     }
     
 
-    // const swaps = await db.client(c)
-    // .select({
-    //   chain: poolSwap.id,
-    //   swapsCount: sql<number>`count(*)`.as("swapsCount"),
-    //   volumeToken0: sql<string>`sum(abs(${poolSwap.amount0}))`.as("volumeToken0"),
-    //   volumeToken1: sql<string>`sum(abs(${poolSwap.amount1}))`.as( "volumeToken1"),
-    // })
-    // .from(poolSwap)
-    // // .where(eq(poolSwap.id, hook.toLowerCase()))
-    // .groupBy(poolSwap.id)
-      
-
     const result = await db.client(c)
       .select({
         chain: poolInitialized.chainId,
@@ -221,25 +141,6 @@ app.get("/hooks/:hook/activity", async (c) => {
   }
 });
 
-
-
-// // Test API for liquidityModified
-// app.get("/liquidityModified", async (c) => {
-//   try {
-//     const result = await db
-//       .client(c)
-//       .select()
-//       .from(liquidityModified)
-//       .limit(5);
-
-//     return Response.json({
-//       result: result,
-//     });
-//   } catch (e) {
-//     console.error("Database operation failed:", e);
-//     return Response.json({ error: (e as Error).message }, { status: 500 });
-//   }
-// });
 
 
 app.get("/*", async (c) => {

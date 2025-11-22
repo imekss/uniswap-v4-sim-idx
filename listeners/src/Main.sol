@@ -21,5 +21,10 @@ contract Triggers is BaseTriggers {
         addTrigger(chainContract(Chains.Unichain, POOLMANAGER_UNICHAIN),listener.triggerOnSwapEvent());
         // addTrigger(chainContract(Chains.Ethereum, POOLMANAGER_UNICHAIN),listener.triggerOnModifyLiquidityEvent());
 
+        // Base
+        addTrigger(chainContract(Chains.Base, POOLMANAGER_BASE),listener.triggerOnInitializeEvent());
+        addTrigger(chainContract(Chains.Base, POOLMANAGER_BASE),listener.triggerOnSwapEvent());
+        // addTrigger(chainContract(Chains.Ethereum, POOLMANAGER_BASE),
+
     }
 }
