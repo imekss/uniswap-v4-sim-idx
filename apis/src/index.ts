@@ -59,28 +59,13 @@ app.get("/totalsSwap", async (c) => {
 // Total Pools/Swap/Hooks by Chain
 app.get("/totalsByChain", async (c) => {
   try {
-    const poolSwapSub =  db.client(c)
-    .select({ 
-      chainId: poolSwap.chainId,
-      totSwaps: count().as("totSwaps")
-    })
-    .from(poolSwap)
-    .groupBy(poolSwap.chainId)
-    .as("poolSwap_t");
-
     const poolInit = await db.client(c)
     .select({ 
       chainId: poolInitialized.chainId,
       totPools: sql<number>`count(distinct ${poolInitialized.id})`.as("totPools"),
       totHooks: sql<number>`count(distinct ${poolInitialized.hooks})`.as("totHooks")
-      // ,
-      // totSwaps: sql<number>`coalesce(sum(${poolSwapSub.totSwaps}), 0)`.as("totSwaps"),
     })
     .from(poolInitialized)
-    //   .leftJoin(
-    //     poolSwapSub,
-    //       eq(poolInitialized.chainId, poolSwapSub.chainId)
-    //   )
     .groupBy(poolInitialized.chainId);
 
     return Response.json( { data: poolInit } );
@@ -93,7 +78,28 @@ app.get("/totalsByChain", async (c) => {
 }
 );
 
+// Total Pools/Swap/Hooks by Chain
+app.get("/totalsByChain", async (c) => {
+  try {
+    const poolInit = await db.client(c)
+    .select({ 
+      chainId: poolInitialized.chainId,
+      totPools: sql<number>`count(distinct ${poolInitialized.id})`.as("totPools"),
+      totHooks: sql<number>`count(distinct ${poolInitialized.hooks})`.as("totHooks")
+    })
+    .from(poolInitialized)
+    .where(eq(poolInitialized.chainId, 1))
+    .groupBy(poolInitialized.chainId);
 
+    return Response.json( { data: poolInit } );
+
+  }
+  catch(e){
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+}
+);
 
 
 // // API endpoint for hook adoption statisticss
