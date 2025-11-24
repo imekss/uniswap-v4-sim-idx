@@ -73,7 +73,6 @@ contract PoolManagerListener is PoolManager$OnInitializeEvent , PoolManager$OnSw
         address hooks,
         uint160 sqrtPriceX96,
         int24 tick
-  
     );
 
 /// @custom:index swap_by_chain BTREE (chainId);

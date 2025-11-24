@@ -33,7 +33,6 @@ app.get("/totalsSwap", async (c) => {
 // Totals by chain
 app.get("/chain/totals", async (c) => {
   try {
-    
     const poolSwapSub = db.client(c)
       .select({
         chainId: poolSwap.chainId,
