@@ -56,8 +56,9 @@ import "sim-idx-generated/Generated.sol";
 
 
 contract PoolManagerListener is PoolManager$OnInitializeEvent , PoolManager$OnSwapEvent {
-/// @custom:index init_by_chain BTREE (chainId);
-/// @custom:index init_by_chain BTREE (chainId, id);
+/// @custom:index init_by_chain_pool BTREE (chainId, id);
+/// @custom:index init_by_hook BTREE (hooks);
+/// @custom:index init_by_pool BTREE (id);
     event PoolInitialized(
         uint64 chainId,
         bytes32 txnHash,
@@ -74,8 +75,8 @@ contract PoolManagerListener is PoolManager$OnInitializeEvent , PoolManager$OnSw
   
     );
 
-/// @custom:index swap_by_chain BTREE (chainId);
-/// @custom:index swap_by_chain BTREE (chainId, id);
+/// @custom:index swap_by_chain_pool BTREE (chainId, id);
+/// @custom:index swap_by_pool BTREE (id);
     event PoolSwap(
         uint64 chainId,
         bytes32 txnHash,
