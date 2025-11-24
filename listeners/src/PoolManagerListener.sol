@@ -75,7 +75,7 @@ contract PoolManagerListener is PoolManager$OnInitializeEvent , PoolManager$OnSw
         int24 tick
     );
 
-/// @custom:index swap_by_chain BTREE (chainId);
+/// @custom:index swap_by_chain BTREE (chainId); 
 /// @custom:index swap_by_chain_pool BTREE (chainId, id);
 /// @custom:index swap_by_pool BTREE (id);
     event PoolSwap(

@@ -1,5 +1,4 @@
 import { eq, sql , ne, and , count} from "drizzle-orm";
-// import { poolInitialized, poolSwap, liquidityModified } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { poolInitialized, poolSwap } from "./db/schema/Listener"; // Adjust the import path as necessary
 import { types, db, App, middlewares } from "@duneanalytics/sim-idx"; // Import schema to ensure it's registered
 import { isValidAddress, isValidChainId, zeroAddress, Address } from "./validation"; // Utility functions for validation
@@ -28,6 +27,43 @@ app.get("/totalsSwap", async (c) => {
   }
 }
 );
+
+// Totals by chain
+app.get("/chain/totals2", async (c) => {
+  try {
+    const poolSwapSub = db.client(c)
+      .select({
+        chainId: poolSwap.chainId,
+        totSwaps: count().as("totSwaps"),
+      })
+      .from(poolSwap)
+      .groupBy(poolSwap.chainId)
+      .as("poolSwap_t");
+
+    const poolInit = await db.client(c)
+    .select({ 
+      chainId: poolInitialized.chainId,
+      totPools: sql<number>`count(distinct ${poolInitialized.id})`.as("totPools"),
+      totHooks: sql<number>`count(distinct ${poolInitialized.hooks})`.as("totHooks"),
+      totSwaps: sql<number>`coalesce(${poolSwapSub.totSwaps}, 0)`.as("totSwaps"),
+    })
+    .from(poolInitialized)
+      .leftJoin(
+        poolSwapSub,
+        eq(poolInitialized.chainId, poolSwapSub.chainId),
+      )
+    .groupBy(poolInitialized.chainId);
+
+    return Response.json( { data: poolInit } );
+
+  }
+  catch(e){
+    console.error("Database operation failed:", e);
+    return Response.json({ error: (e as Error).message }, { status: 500 });
+  }
+}
+);
+
 
 
 // Totals by chain
