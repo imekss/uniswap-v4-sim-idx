@@ -7,26 +7,26 @@ const app = App.create();
 
 app.use("*", middlewares.authentication);
 
-// Total Swaps by Chain
-app.get("/totalsSwap", async (c) => {
-  try {
-    const poolSwapSub =  await db.client(c)
-    .select({ 
-      chainId: poolSwap.chainId,
-      totSwaps: count().as("totSwaps")
-    })
-    .from(poolSwap)
-    .groupBy(poolSwap.chainId);
+// // Total Swaps by Chain
+// app.get("/totalsSwap", async (c) => {
+//   try {
+//     const poolSwapSub =  await db.client(c)
+//     .select({ 
+//       chainId: poolSwap.chainId,
+//       totSwaps: count().as("totSwaps")
+//     })
+//     .from(poolSwap)
+//     .groupBy(poolSwap.chainId);
 
-    return Response.json( { data: poolSwapSub } );
+//     return Response.json( { data: poolSwapSub } ); 
 
-  }
-  catch(e){
-    console.error("Database operation failed:", e);
-    return Response.json({ error: (e as Error).message }, { status: 500 });
-  }
-}
-);
+//   }
+//   catch(e){
+//     console.error("Database operation failed:", e);
+//     return Response.json({ error: (e as Error).message }, { status: 500 });
+//   }
+// }
+// );
 
 // Totals by chain
 app.get("/chain/totals2", async (c) => {
